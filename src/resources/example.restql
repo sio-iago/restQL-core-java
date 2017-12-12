@@ -1,9 +1,0 @@
-from product as products
-    headers
-        content-type = "application/json"
-    with
-        limit = product.id -> flatten -> json
-        fields = ["rating", "tags", "images", "groups"]
-    only
-        id, name, cep
-        phone -> matches("021")
