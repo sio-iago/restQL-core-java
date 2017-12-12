@@ -41,12 +41,6 @@ Add restQL dependency to your project
 com.b2wdigital:restql-core-java:2.2
 ```
 
-**Lein**
-
-```
-[com.b2wdigital/restql-core "2.1.7"]
-```
-
 ### First query
 
 ```java
