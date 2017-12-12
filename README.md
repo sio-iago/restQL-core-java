@@ -17,7 +17,7 @@ You can learn more about restQL query language [here](https://github.com/B2W-BIT
 
 restQL-core is built upon the battle proven [HttpKit](http://www.http-kit.org/600k-concurrent-connection-http-kit.html) and [Clojure core.async](http://clojure.com/blog/2013/06/28/clojure-core-async-channels.html) to maximize performance and throughtput.
 
-If you're using another languagem or working in a client application you may want to check  [restQL-Server](https://github.com/B2W-BIT/restQL-server).
+If you're using Clojure you may want to check [restQL-core](https://github.com/B2W-BIT/restQL-core) or [restQL-Server](https://github.com/B2W-BIT/restQL-server) if you're using another languagem or working in a client application.
 
 ## Getting Started
 
@@ -30,15 +30,15 @@ Add restQL dependency to your project
 ```xml
 <dependency>
 	<groupId>com.b2wdigital</groupId>
-        <artifactId>restql-core</artifactId>
-       	<version>2.1.7</version>
+        <artifactId>restql-core-java</artifactId>
+       	<version>2.2</version>
 </dependency>
 ```
 
 **Gradle**
 
 ```
-com.b2wdigital:restql-core:2.1.7
+com.b2wdigital:restql-core-java:2.2
 ```
 
 **Lein**
@@ -49,8 +49,6 @@ com.b2wdigital:restql-core:2.1.7
 
 ### First query
 
-**Java**
-
 ```java
 ClassConfigRepository config = new ClassConfigRepository();
 config.put("user", "http://your.api.url/users/:name");
@@ -59,13 +57,6 @@ RestQL restQL = new RestQL(config);
 QueryResponse response = restql.executeQuery("from user with name = ?", "Duke Nukem");
 
 System.out.println("The response JSON is: " + response.toString());
-```
-
-**Clojure**
-
-```clojure
-(require '[restql.core.api.restql :as restql])
-(restql/execute-query :mappings { :user "http://your.api.url/users/:name" } :query "from user with name = $name" :params { :name "Duke Nukem" } )
 ```
 
 In the example above restQL will call user API passing "Duke Nukem" in the name param.
