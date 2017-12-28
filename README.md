@@ -23,11 +23,18 @@ If you're using Clojure you may want to check [restQL-core](https://github.com/B
 
 ### Installation
 
-Add restQL dependency to your project
+Add Clojars repository and restQL dependency to your project
 
 **Maven**
 
 ```xml
+<repositories>
+    <repository>
+        <id>clojars.org</id>
+        <url>http://clojars.org/repo</url>
+    </repository>
+</repositories>
+...
 <dependency>
 	<groupId>com.b2wdigital</groupId>
         <artifactId>restql-core-java</artifactId>
@@ -38,6 +45,12 @@ Add restQL dependency to your project
 **Gradle**
 
 ```
+repositories {
+    maven { 
+        url "http://clojars.org/repo"
+  }
+}
+...
 com.b2wdigital:restql-core-java:2.2
 ```
 
