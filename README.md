@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/B2W-BIT/restQL-core.svg?branch=master)](https://travis-ci.org/B2W-BIT/restQL-core)
-# restQL-Core
+# restQL-core-java
 
 restQL-core allows you to run restQL queries directly from JVM applications, making easy to fetch information from multiple services in the most efficient manner. e.g.:
 
@@ -38,7 +38,7 @@ Add Clojars repository and restQL dependency to your project
 <dependency>
 	<groupId>com.b2wdigital</groupId>
         <artifactId>restql-core-java</artifactId>
-       	<version>2.2</version>
+       	<version>2.2.1</version>
 </dependency>
 ```
 
@@ -51,17 +51,17 @@ repositories {
   }
 }
 ...
-com.b2wdigital:restql-core-java:2.2
+compile 'com.b2wdigital:restql-core-java:2.2.1'
 ```
 
 ### First query
 
 ```java
 ClassConfigRepository config = new ClassConfigRepository();
-config.put("user", "http://your.api.url/users/:name");
+config.put("planets", "https://swapi.co/api/planets/:id");
 
 RestQL restQL = new RestQL(config);
-QueryResponse response = restql.executeQuery("from user with name = ?", "Duke Nukem");
+QueryResponse response = restql.executeQuery("from planets with id = ?", "1");
 
 System.out.println("The response JSON is: " + response.toString());
 ```
