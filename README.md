@@ -66,7 +66,7 @@ QueryResponse response = restql.executeQuery("from planets with id = ?", "1");
 System.out.println("The response JSON is: " + response.toString());
 ```
 
-In the example above restQL will call user API passing "Duke Nukem" in the name param.
+In the example above restQL will call StarWars planet API passing "1" as param.
 
 ### Configuration
 restQL receives a configuration class with the API mappings. You can use the available configuration repositories -- `SystemPropertiesConfigRepository`, `PropertiesFileConfigRepository` or `ClassConfigRepository` -- or implement your own, using the `ConfigRepository` interface.
