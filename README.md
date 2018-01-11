@@ -61,7 +61,7 @@ ClassConfigRepository config = new ClassConfigRepository();
 config.put("planets", "https://swapi.co/api/planets/:id");
 
 RestQL restQL = new RestQL(config);
-QueryResponse response = restQL.executeQuery("from planets with id = ?", "1");
+QueryResponse response = restQL.executeQuery("from planets with id = ?", 1);
 
 System.out.println("The response JSON is: " + response.toString());
 ```
