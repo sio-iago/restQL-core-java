@@ -3,11 +3,13 @@ package restql.core.annotation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import restql.core.RestQL;
 import restql.core.annotation.util.BadJedi;
 import restql.core.annotation.util.Jedi;
 import restql.core.annotation.util.LightSaber;
 import restql.core.annotation.util.Person;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,6 +28,25 @@ public class RestEntityMapperTest {
         String parsedQuery = RestEntityMapper.getEntityQuery(Person.class);
 
         assertEquals(expectedResult, parsedQuery);
+    }
+
+    @Test
+    public void testSimpleEntityMappingWithQueryParams() throws Exception {
+        String expectedResult = "from person with name = \"Luke\"";
+
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("person.name", "Luke");
+
+        String parsedQuery = RestEntityMapper.getEntityQuery(Person.class, queryParams);
+
+        assertEquals(expectedResult, parsedQuery);
+    }
+
+    @Test(expected = RestEntityMappingException.class)
+    public void testInvalidQueryParam() throws Exception {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("name", "Luke");
+        RestEntityMapper.getEntityQuery(Person.class, queryParams);
     }
 
     @Test(expected = RestEntityMappingException.class)

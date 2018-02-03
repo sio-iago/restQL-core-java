@@ -49,4 +49,8 @@ public class RestEntityMeta {
     public Class getEntityClass() {
         return entityClass;
     }
+
+    public String[] getFullQualifiedResponseLookupPath() {
+        return this.entityName.concat(".").concat(this.responseLookupPath).split("\\.");
+    }
 }

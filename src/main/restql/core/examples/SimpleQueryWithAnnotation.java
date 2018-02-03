@@ -1,61 +1,32 @@
 package restql.core.examples;
 
-import restql.core.annotation.RestEntity;
 import restql.core.manager.RestEntityManager;
 import restql.core.query.QueryOptions;
-import restql.core.response.QueryResponse;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-@RestEntity(
-        name = "cards",
-        resourceMapping = "http://api.magicthegathering.io/v1/cards/:id",
-        responseLookupPath = "cards.cards"
-)
-class Card {
-    private Long number;
-    private String type;
-    private String name;
-
-    public Long getNumber() {
-        return number;
-    }
-
-    public void setNumber(Long number) {
-        this.number = number;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-}
 
 public class SimpleQueryWithAnnotation {
 
     public static void main(String[] args) {
 
         QueryOptions opts = new QueryOptions();
-        opts.setDebugging(false);
+        opts.setDebugging(true);
         opts.setGlobalTimeout(10000);
         opts.setTimeout(3000);
 
         RestEntityManager entityManager = new RestEntityManager(opts);
-        List<Card> cards = entityManager.fetch(Card.class);
 
-        for (Card card : cards) {
-            System.out.println(String.format("@{%d} %s - %s", card.getNumber(), card.getType(), card.getName()));
-        }
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("Card.id", 1);
+
+        Card card = entityManager.fetchOne(Card.class, queryParams, opts);
+
+        System.out.println(String.format("%s %s [ %s ] - %s",
+                card.getManaCost(),
+                card.getName(),
+                card.getType(),
+                card.getCardSet() != null ? card.getCardSet().getName() : ""));
     }
 }

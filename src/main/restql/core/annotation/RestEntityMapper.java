@@ -49,7 +49,7 @@ public class RestEntityMapper {
         Map<String, RestEntityMeta> traversedEntities = new LinkedHashMap<>();
 
         RestEntityMeta traversedRootEntity = extractMetaFromEntity(restEntityClass, queryParams);
-        traversedEntities.put(restEntityClass.getName(), traversedRootEntity);
+        traversedEntities.put(traversedRootEntity.getEntityClass().getName(), traversedRootEntity);
 
         if (traversedRootEntity.getRelationships() != null) {
             for (RestRelationMeta relationship : traversedRootEntity.getRelationships()) {
@@ -79,14 +79,12 @@ public class RestEntityMapper {
                 .append(restEntityAnnotation.name());
 
         // TODO add with logic
-        if (!queryParams.isEmpty()) {
+        if (queryParams != null && !queryParams.isEmpty()) {
             boolean foundQueryParamForEntity = false;
 
             if (queryParams.containsKey(restEntityAnnotation.name())) {
-                if (!foundQueryParamForEntity) {
-                    queryBuilder.append(" with ");
-                    foundQueryParamForEntity = true;
-                }
+                queryBuilder.append(" with ");
+                foundQueryParamForEntity = true;
 
                 RestRelationMeta relationshipMetadata = (RestRelationMeta) queryParams.get(restEntityAnnotation.name());
 
@@ -94,6 +92,39 @@ public class RestEntityMapper {
                         .append(relationshipMetadata.getTargetAttribute())
                         .append(" = ")
                         .append(relationshipMetadata.getMappedBy());
+            }
+
+            for (Map.Entry<String, Object> param : queryParams.entrySet()) {
+
+                // RestRelationMeta are not simple query parameters, so they shouldn't be caught here
+                if (param.getValue() instanceof RestRelationMeta) {
+                    continue;
+                }
+
+                String[] paramPath = param.getKey().split("\\.");
+
+                if (paramPath.length != 2) {
+                    throw new RestEntityMappingException(
+                            String.format("Error building query with [%s]. " +
+                                            "QueryParams mapping should be in format entity.entityParam",
+                                    param.getKey())
+                    );
+                }
+
+                if (paramPath[0].equals(restEntityAnnotation.name())) {
+                    if (!foundQueryParamForEntity) {
+                        queryBuilder.append(" with ");
+                        foundQueryParamForEntity = true;
+                    } else {
+                        queryBuilder.append(", ");
+                    }
+
+                    queryBuilder
+                            .append(paramPath[1])
+                            .append(" = \"")
+                            .append(param.getValue().toString())
+                            .append("\"");
+                }
             }
         }
 
@@ -120,6 +151,10 @@ public class RestEntityMapper {
                         restRelationAnnotation.isMultiple()
                 ));
             }
+        }
+
+        if (restEntityAnnotation.ignoreErors()) {
+            queryBuilder.append(" ignore-errors");
         }
 
         return new RestEntityMeta(

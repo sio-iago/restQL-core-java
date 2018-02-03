@@ -15,4 +15,6 @@ public @interface RestEntity {
 
     String responseLookupPath() default "";
 
+    boolean ignoreErors() default false;
+
 }

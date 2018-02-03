@@ -1,14 +1,16 @@
 package restql.core.manager;
 
 import restql.core.RestQL;
-import restql.core.annotation.RestEntity;
 import restql.core.annotation.RestEntityMapper;
 import restql.core.annotation.RestEntityMeta;
+import restql.core.annotation.RestRelation;
 import restql.core.config.ClassConfigRepository;
 import restql.core.config.ConfigRepository;
 import restql.core.query.QueryOptions;
 import restql.core.response.QueryResponse;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -89,7 +91,13 @@ public class RestEntityManager {
         QueryResponse queryResponse = this.executeQuery(restEntityClass, queryParams, queryOptions);
         RestEntityMeta restEntityMeta = RestEntityMapper.extractMetaFromEntity(restEntityClass, queryParams);
 
-        return queryResponse.getList(restEntityMeta.getResponseLookupPath(), restEntityClass);
+        List<T> queryResponseEntityList = queryResponse.getList(restEntityMeta.getFullQualifiedResponseLookupPath(), restEntityClass);
+        for (int i = 0; i < queryResponseEntityList.size(); i++) {
+            T queryResponseEntity = queryResponseEntityList.get(i);
+            resolveRelationshipsForEntity(queryResponse, queryResponseEntity, restEntityMeta);
+        }
+
+        return queryResponseEntityList;
     }
 
     public <T> T fetchOne(Class<T> restEntityClass) {
@@ -108,6 +116,60 @@ public class RestEntityManager {
         QueryResponse queryResponse = this.executeQuery(restEntityClass, queryParams, queryOptions);
         RestEntityMeta restEntityMeta = RestEntityMapper.extractMetaFromEntity(restEntityClass, queryParams);
 
-        return queryResponse.get(restEntityMeta.getResponseLookupPath(), restEntityClass);
+        T queryResponseEntity = queryResponse.get(restEntityMeta.getFullQualifiedResponseLookupPath(), restEntityClass);
+        resolveRelationshipsForEntity(queryResponse, queryResponseEntity, restEntityMeta);
+
+        return queryResponseEntity;
+    }
+
+    protected <T> void resolveRelationshipsForEntity(QueryResponse queryResponse,
+                                                     T entity,
+                                                     RestEntityMeta restEntityMeta) {
+
+        for (Field field : restEntityMeta.getEntityClass().getDeclaredFields()) {
+            // Non relation, just skip
+            if (!field.isAnnotationPresent(RestRelation.class)) {
+                continue;
+            }
+
+            // Trying to find the setter for the RestRelation annotated class
+            String fieldSetterName = "set"
+                    .concat(field.getName().substring(0, 1).toUpperCase())
+                    .concat(field.getName().substring(1, field.getName().length()));
+
+            Method setterMethod = null;
+            try {
+                setterMethod = entity.getClass().getMethod(fieldSetterName, field.getType());
+
+                Class<?> restRelationEntityClass = field.getType();
+                RestRelation restRelationAnnotation = field.getDeclaredAnnotation(RestRelation.class);
+                RestEntityMeta restRelationEntityMeta = RestEntityMapper.extractMetaFromEntity(restRelationEntityClass,
+                        null);
+
+                // If it's a list, we just parse as a list
+                if (restRelationAnnotation.isMultiple()) {
+                    setterMethod.invoke(
+                            entity,
+                            queryResponse.getList(
+                                    restRelationEntityMeta.getFullQualifiedResponseLookupPath(),
+                                    restRelationEntityClass
+                            )
+                    );
+                } else {
+                    setterMethod.setAccessible(true);
+                    setterMethod.invoke(
+                            entity,
+                            restRelationEntityClass.cast(queryResponse.get(
+                                    restRelationEntityMeta.getFullQualifiedResponseLookupPath(),
+                                    restRelationEntityClass)
+                            )
+                    );
+                }
+            } catch (Exception ex) {
+                // Setter method not found, just skip
+                logger.info("Error calling setter for field " + field.getName());
+                throw new RuntimeException("Error calling setter");
+            }
+        }
     }
 }
