@@ -6,6 +6,7 @@ import org.junit.runners.JUnit4;
 import restql.core.annotation.util.BadJedi;
 import restql.core.annotation.util.Jedi;
 import restql.core.annotation.util.LightSaber;
+import restql.core.annotation.util.NonVipPerson;
 import restql.core.annotation.util.Person;
 
 import java.util.HashMap;
@@ -26,6 +27,15 @@ public class RestEntityMapperTest {
         String expectedResult = "from person";
 
         String parsedQuery = RestEntityMapper.getEntityQuery(Person.class);
+
+        assertEquals(expectedResult, parsedQuery);
+    }
+
+    @Test
+    public void testSimpleEntityMappingIgnoreErrors() throws Exception {
+        String expectedResult = "from NonVipPerson ignore-errors";
+
+        String parsedQuery = RestEntityMapper.getEntityQuery(NonVipPerson.class);
 
         assertEquals(expectedResult, parsedQuery);
     }
