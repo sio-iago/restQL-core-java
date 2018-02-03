@@ -1,4 +1,4 @@
-package restql.core.examples;
+package restql.core.examples.model;
 
 import restql.core.annotation.RestEntity;
 import restql.core.annotation.RestRelation;
@@ -8,7 +8,7 @@ import restql.core.annotation.RestRelation;
         resourceMapping = "http://api.magicthegathering.io/v1/cards/:id",
         responseLookupPath = "card"
 )
-class Card {
+public class Card {
     private String manaCost;
     private String type;
     private String name;

@@ -1,5 +1,6 @@
 package restql.core.examples;
 
+import restql.core.examples.model.Card;
 import restql.core.manager.RestEntityManager;
 import restql.core.query.QueryOptions;
 

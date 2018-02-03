@@ -1,4 +1,4 @@
-package restql.core.examples;
+package restql.core.examples.model;
 
 import restql.core.annotation.RestEntity;
 
@@ -8,7 +8,7 @@ import restql.core.annotation.RestEntity;
         responseLookupPath = "set",
         ignoreErors = true
 )
-class CardSet {
+public class CardSet {
     private String code;
 
     private String name;
